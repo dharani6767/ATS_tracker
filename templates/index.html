@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS - Recruiter Portal</title>
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --bg-body: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --white: #ffffff;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .wrapper { display: flex; min-height: 100vh; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 3rem;
+            letter-spacing: -0.025em;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 0.8rem 1rem;
+            display: block;
+            border-radius: var(--radius);
+            font-weight: 500;
+            transition: 0.2s;
+            margin-bottom: 0.5rem;
+        }
+        .nav-link:hover { background: #f1f5f9; color: var(--text-main); }
+        .nav-link.active { background: #eff6ff; color: var(--primary-color); }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header { margin-bottom: 2.5rem; }
+        header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+        header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .form-container {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.6rem; color: var(--text-main); }
+        
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus { outline: none; border-color: var(--secondary-color); }
+
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            padding: 2.5rem;
+            text-align: center;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            background: #fbfcfd;
+            transition: 0.2s;
+        }
+        .upload-area:hover { border-color: var(--secondary-color); background: #f0f7ff; }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.6; cursor: wait; }
+
+        /* --- RESULTS PANEL --- */
+        .analysis-results { display: none; margin-top: 3rem; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .score-card {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .score-circle {
+            min-width: 120px; height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-circle span { font-size: 2.5rem; font-weight: 800; }
+        .score-circle small { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        .report-section {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        .report-section h3 { font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+        
+        .output-box {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <aside class="sidebar">
+            <div class="logo">RecruiterAI</div>
+            <nav>
+                <a href="#" class="nav-link active">Resume Analyzer</a>
+                <a href="#" class="nav-link">History</a>
+                <a href="#" class="nav-link">Job Templates</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <section id="upload">
+                <header>
+                    <h1>Smart Resume Audit</h1>
+                    <p>Get instant AI ratings, reviews, and SWOT analysis.</p>
+                </header>
+
+                <div class="form-container">
+                    <form id="analysisForm">
+                        <div class="form-group">
+                            <label>Target Job Description</label>
+                            <textarea id="jd-input" class="form-control" rows="5" placeholder="Paste the job requirements here..." required></textarea>
+                        </div>
+                        <div class="upload-area">
+                            <label for="resume-file" style="cursor: pointer;">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">📄</div>
+                                <strong>Select Candidate Resume (PDF)</strong>
+                                <p style="color: var(--text-muted); font-size: 0.9rem;">Maximum file size: 5MB</p>
+                            </label>
+                            <input type="file" id="resume-file" accept=".pdf" style="margin-top: 1rem; display: block; width: 100%;" required>
+                        </div>
+                        <button type="submit" class="btn" id="submit-btn">Run Analysis</button>
+                    </form>
+
+                    <!-- ANALYSIS RESULTS -->
+                    <div id="results-panel" class="analysis-results">
+                        <div class="score-card">
+                            <div class="score-circle">
+                                <span id="match-score">--</span>
+                                <small>Rating</small>
+                            </div>
+                            <div>
+                                <h2>Evaluation Outcome</h2>
+                                <p id="result-status">AI-Powered Assessment Complete</p>
+                            </div>
+                        </div>
+
+                        <div class="report-section" style="border-left: 5px solid var(--primary-color);">
+                            <h3>📝 Review Summary</h3>
+                            <div id="review-output" class="output-box">Processing...</div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="report-section" style="border-left: 5px solid var(--success);">
+                                <h3>✅ Advantages</h3>
+                                <div id="pros-output" class="output-box"></div>
+                            </div>
+                            <div class="report-section" style="border-left: 5px solid var(--danger);">
+                                <h3>❌ Disadvantages</h3>
+                                <div id="cons-output" class="output-box"></div>
+                            </div>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>🔍 Detailed Analysis</h3>
+                            <div id="full-details-output" class="output-box" style="font-size: 0.9rem;"></div>
+                        </div>
+                        
+                        <button class="btn" style="background: #f1f5f9; color: var(--text-main); margin-top: 1rem;" onclick="window.location.reload()">New Analysis</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('analysisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const jdText = document.getElementById('jd-input').value;
+            const resumeFile = document.getElementById('resume-file').files[0];
+            const btn = document.getElementById('submit-btn');
+            const resultsPanel = document.getElementById('results-panel');
+
+            // UI Feedback
+            btn.disabled = true;
+            btn.innerText = "Processing Resume...";
+
+            const formData = new FormData();
+            formData.append('resume', resumeFile);
+            formData.append('job_description', jdText);
+
+            try {
+                // CHANGED: Use a relative path to avoid CORS issues and "Failed to fetch" errors.
+                // Assuming the Flask app serves the static files or is proxied.
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server Error: ${response.status} - ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log("AI Data Received:", data);
+
+                const fullText = data.ats_result || "";
+
+                // 1. Extract Score/Rating (Look for % or a number out of 100)
+                const scoreMatch = fullText.match(/(\d{1,3})%/);
+                document.getElementById('match-score').innerText = scoreMatch ? scoreMatch[1] + '%' : 'N/A';
+
+                // 2. Display the raw output in the Full Details box first to ensure SOMETHING is visible
+                document.getElementById('full-details-output').innerText = fullText;
+
+                // 3. Heuristic Splitting for UI sections
+                // This looks for common headers used in AI recruitment prompts
+                const strengthsRegex = /(?:Advantages|Strengths|Pros):?([\s\S]*?)(?:Disadvantages|Weaknesses|Gaps|Improvement|$)/i;
+                const weaknessesRegex = /(?:Disadvantages|Weaknesses|Gaps|Cons|Missing):?([\s\S]*?)(?:Summary|Conclusion|$)/i;
+                
+                const strengthsMatch = fullText.match(strengthsRegex);
+                const weaknessesMatch = fullText.match(weaknessesRegex);
+
+                // Set Advantages
+                document.getElementById('pros-output').innerText = strengthsMatch 
+                    ? strengthsMatch[1].trim() 
+                    : "Refer to the detailed analysis below for candidate strengths.";
+
+                // Set Disadvantages
+                document.getElementById('cons-output').innerText = weaknessesMatch 
+                    ? weaknessesMatch[1].trim() 
+                    : "Refer to the detailed analysis below for areas of improvement.";
+
+                // Set Summary (First few paragraphs or sentences)
+                const summary = fullText.split(/\n\s*\n/)[0];
+                document.getElementById('review-output').innerText = summary || "Evaluation completed successfully.";
+
+                // Reveal results
+                btn.style.display = 'none';
+                resultsPanel.style.display = 'block';
+                resultsPanel.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error("Analysis Error:", error);
+                alert(`Analysis Failed.\n\nError details: ${error.message}\n\nTroubleshooting:\n1. Ensure your local Python server is running.\n2. Ensure the endpoint '/analyze' is configured correctly in your app.py.`);
+                btn.disabled = false;
+                btn.innerText = "Run Analysis";
+            }
+        });
+    </script>
+</body>
+</html>
